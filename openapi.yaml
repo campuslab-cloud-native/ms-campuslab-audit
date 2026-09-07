@@ -1,0 +1,125 @@
+openapi: 3.0.3
+
+info:
+  title: CampusLab Audit API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8085
+
+tags:
+  - name: Audit
+
+paths:
+
+  /api/audit/events:
+
+    get:
+      tags:
+        - Audit
+      summary: Consultar eventos de auditoría
+      operationId: getAuditEvents
+      security:
+        - bearerAuth: []
+
+      parameters:
+
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+
+      responses:
+        '200':
+          description: Eventos encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEventResponse'
+        '401':
+          description: No autenticado
+        '403':
+          description: No autorizado
+
+  /api/audit/bookings/{bookingId}:
+
+    get:
+      tags:
+        - Audit
+      summary: Obtener timeline de una reserva
+      operationId: getBookingTimeline
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: Timeline encontrado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEventResponse'
+        '401':
+          description: No autenticado
+        '403':
+          description: No autorizado
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    AuditEventResponse:
+      type: object
+      properties:
+        eventId:
+          type: string
+        bookingId:
+          type: integer
+          format: int64
+        userId:
+          type: string
+        type:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        source:
+          type: string
