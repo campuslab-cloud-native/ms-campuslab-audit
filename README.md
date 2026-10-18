@@ -21,16 +21,16 @@ Microservicio de auditoría de CampusLab.
 ## Endpoints
 
 ```http
-GET /api/audit/events
-GET /api/audit/bookings/{bookingId}
+GET /api/v1/audit/events
+GET /api/v1/audit/bookings/{bookingId}
 ```
 
 ## Filtros
 
 ```http
-GET /api/audit/events?userId=
-GET /api/audit/events?type=
-GET /api/audit/events?from=&to=
+GET /api/v1/audit/events?userId=
+GET /api/v1/audit/events?type=
+GET /api/v1/audit/events?from=&to=
 ```
 
 ## Acceso

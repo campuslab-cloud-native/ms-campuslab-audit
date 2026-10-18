@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/audit")
+@RequestMapping("/api/v1/audit")
 @RequiredArgsConstructor
 public class AuditController {
 

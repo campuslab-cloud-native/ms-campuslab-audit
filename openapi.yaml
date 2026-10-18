@@ -12,7 +12,7 @@ tags:
 
 paths:
 
-  /api/audit/events:
+  /api/v1/audit/events:
 
     get:
       tags:
@@ -64,7 +64,7 @@ paths:
         '403':
           description: No autorizado
 
-  /api/audit/bookings/{bookingId}:
+  /api/v1/audit/bookings/{bookingId}:
 
     get:
       tags:
