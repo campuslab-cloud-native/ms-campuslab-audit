@@ -8,7 +8,6 @@ Microservicio de auditoría de CampusLab.
 - Spring Boot
 - Spring Data JPA
 - Oracle
-- Kafka
 
 ## Funcionalidades
 
@@ -44,15 +43,6 @@ ADMIN
 AUDITOR
 ```
 
-## Kafka
-
-Consume:
-
-```text
-bookings.events
-audit.timeline
-```
-
 ## Base de datos
 
 Oracle.
@@ -76,4 +66,12 @@ KAFKA_BOOTSTRAP_SERVERS=
 
 ```bash
 ./mvnw clean package
+```
+
+La suite predeterminada no requiere Oracle. La prueba de integración del
+contexto de aplicación es opt-in y requiere una base Oracle disponible, además
+de `DB_URL`, `DB_USERNAME` y `DB_PASSWORD`:
+
+```bash
+./mvnw -DRUN_AUDIT_ORACLE_INTEGRATION_TESTS=true test
 ```
