@@ -1,53 +1,38 @@
 # ms-campuslab-audit
 
-Microservicio de auditoría de CampusLab.
+Microservicio de auditoría de CampusLab. Persiste eventos de reserva en Oracle
+y expone consultas de solo lectura para el BFF.
 
-## Tecnologías
+## Endpoints internos
 
-- Java
-- Spring Boot
-- Spring Data JPA
-- Oracle
+| Método | Ruta | Parámetros | Respuesta |
+|---|---|---|---|
+| `GET` | `/api/v1/audit/events` | `userId`, `type`, `from`, `to` (opcionales) | Lista de eventos |
+| `GET` | `/api/v1/audit/bookings/{bookingId}` | `bookingId` en la ruta | Timeline de eventos de la reserva |
 
-## Funcionalidades
+`from` y `to` son fechas-horas locales ISO-8601. Los contratos de respuestas
+están en [`openapi.yaml`](./openapi.yaml).
 
-- Registrar eventos de reservas.
-- Mantener timeline de acciones.
-- Consultar trazabilidad.
-- Consultar eventos asociados a una reserva.
-- Filtrar eventos de auditoría.
+## Autenticación y autorización
 
-## Endpoints
+El servicio Audit no implementa autenticación ni autorización por roles. El
+control JWT y de roles de las rutas públicas se aplica en `ms-campuslab-bff`
+(detrás del API Gateway). Las rutas de este servicio son internas y no deben
+confundirse con una protección propia del microservicio.
 
-```http
-GET /api/v1/audit/events
-GET /api/v1/audit/bookings/{bookingId}
-```
+## Integración Kafka
 
-## Filtros
+- Audit consume `bookings.events` con el consumer group `campuslab-audit`.
+- Al procesar un evento de reserva, publica un `AuditEvent` en `audit.timeline`.
+- La clave Kafka de los eventos publicados es `bookingId`.
+- No hay un consumidor de `audit.timeline` en este repositorio.
 
-```http
-GET /api/v1/audit/events?userId=
-GET /api/v1/audit/events?type=
-GET /api/v1/audit/events?from=&to=
-```
+Los nombres y DTO se configuran en `src/main/resources/application.properties`
+y `src/main/java/ms_campuslab_audit/messaging/kafka`.
 
-## Acceso
+## Base de datos y configuración
 
-Solo lectura.
-
-## Roles
-
-```text
-ADMIN
-AUDITOR
-```
-
-## Base de datos
-
-Oracle.
-
-## Variables de entorno
+La persistencia usa Oracle. Variables:
 
 ```env
 DB_URL=
@@ -56,21 +41,15 @@ DB_PASSWORD=
 KAFKA_BOOTSTRAP_SERVERS=
 ```
 
-## Ejecución local
+## Ejecución y pruebas locales
 
 ```bash
 ./mvnw spring-boot:run
-```
-
-## Build
-
-```bash
 ./mvnw clean package
 ```
 
 La suite predeterminada no requiere Oracle. La prueba de integración del
-contexto de aplicación es opt-in y requiere una base Oracle disponible, además
-de `DB_URL`, `DB_USERNAME` y `DB_PASSWORD`:
+contexto es opt-in y requiere una base Oracle disponible:
 
 ```bash
 ./mvnw -DRUN_AUDIT_ORACLE_INTEGRATION_TESTS=true test

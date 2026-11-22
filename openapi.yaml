@@ -3,6 +3,10 @@ openapi: 3.0.3
 info:
   title: CampusLab Audit API
   version: 1.0.0
+  description: >-
+    API interna de consultas de auditoría. Este microservicio no implementa
+    autenticación ni autorización por roles; esas comprobaciones se realizan
+    en ms-campuslab-bff para las rutas públicas.
 
 servers:
   - url: http://localhost:8085
@@ -11,45 +15,35 @@ tags:
   - name: Audit
 
 paths:
-
   /api/v1/audit/events:
-
     get:
       tags:
         - Audit
       summary: Consultar eventos de auditoría
       operationId: getAuditEvents
-      security:
-        - bearerAuth: []
-
       parameters:
-
         - name: userId
           in: query
           required: false
           schema:
             type: string
-
         - name: type
           in: query
           required: false
           schema:
             type: string
-
         - name: from
           in: query
           required: false
           schema:
             type: string
-            format: date-time
-
+            description: Fecha-hora local ISO-8601, sin offset.
         - name: to
           in: query
           required: false
           schema:
             type: string
-            format: date-time
-
+            description: Fecha-hora local ISO-8601, sin offset.
       responses:
         '200':
           description: Eventos encontrados
@@ -59,21 +53,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AuditEventResponse'
-        '401':
-          description: No autenticado
-        '403':
-          description: No autorizado
 
   /api/v1/audit/bookings/{bookingId}:
-
     get:
       tags:
         - Audit
       summary: Obtener timeline de una reserva
       operationId: getBookingTimeline
-      security:
-        - bearerAuth: []
-
       parameters:
         - name: bookingId
           in: path
@@ -81,7 +67,6 @@ paths:
           schema:
             type: integer
             format: int64
-
       responses:
         '200':
           description: Timeline encontrado
@@ -91,21 +76,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AuditEventResponse'
-        '401':
-          description: No autenticado
-        '403':
-          description: No autorizado
 
 components:
-
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
   schemas:
-
     AuditEventResponse:
       type: object
       properties:
@@ -120,6 +93,6 @@ components:
           type: string
         timestamp:
           type: string
-          format: date-time
+          description: Fecha-hora local ISO-8601, sin offset.
         source:
           type: string
