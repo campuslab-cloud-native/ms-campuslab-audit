@@ -25,7 +25,7 @@ class KafkaAuditPublisherTest {
         KafkaTemplate<String, AuditEvent> kafkaTemplate = mock(KafkaTemplate.class);
         when(kafkaTemplate.send(
                 eq("audit.timeline"),
-                eq("42"),
+                eq("booking-event-123"),
                 any(AuditEvent.class)
         )).thenReturn(CompletableFuture.completedFuture(null));
 
@@ -47,7 +47,7 @@ class KafkaAuditPublisherTest {
         var publishedEvent = forClass(AuditEvent.class);
         verify(kafkaTemplate).send(
                 eq("audit.timeline"),
-                eq("42"),
+                eq("booking-event-123"),
                 publishedEvent.capture()
         );
         assertEquals(bookingEvent.eventId(), publishedEvent.getValue().eventId());

@@ -32,9 +32,11 @@ public class KafkaAuditPublisher {
         );
 
         try {
+            // La clave es el eventId: audit.timeline usa cleanup.policy=compact,delete y, con una clave
+            // única por evento, la compactación no elimina el historial de una reserva.
             kafkaTemplate.send(
                     auditTopic,
-                    bookingEvent.bookingId().toString(),
+                    auditEvent.eventId(),
                     auditEvent
             ).get(30, TimeUnit.SECONDS);
 
@@ -50,4 +52,3 @@ public class KafkaAuditPublisher {
         }
     }
 }
-

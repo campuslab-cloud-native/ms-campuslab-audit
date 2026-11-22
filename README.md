@@ -24,8 +24,14 @@ confundirse con una protección propia del microservicio.
 
 - Audit consume `bookings.events` con el consumer group `campuslab-audit`.
 - Al procesar un evento de reserva, publica un `AuditEvent` en `audit.timeline`.
-- La clave Kafka de los eventos publicados es `bookingId`.
-- No hay un consumidor de `audit.timeline` en este repositorio.
+- La clave Kafka de los eventos publicados es el `eventId` (con la política
+  `compact,delete` de `audit.timeline`, una clave única por evento evita que la
+  compactación elimine el historial de una reserva).
+- `audit.timeline` es consumido por `ms-campuslab-report` con el grupo `campuslab-report`.
+- El consumidor usa 3 hilos (uno por partición de `bookings.events`). Si un mensaje
+  falla tras 2 reintentos, o su payload es inválido, se publica en `bookings.events.DLT`
+  y el consumidor continúa con el siguiente.
+- El productor usa `acks=all` e idempotencia (`enable.idempotence=true`).
 
 Los nombres y DTO se configuran en `src/main/resources/application.properties`
 y `src/main/java/ms_campuslab_audit/messaging/kafka`.
